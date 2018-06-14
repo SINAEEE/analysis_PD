@@ -3,7 +3,7 @@ import os
 import json
 from .api import api
 
-RESULT_DIRECTORY = '__results__/crawling'
+RESULT_DIRECTORY = '__results__/crawlling'
 
 
 def preprocess_foreign_visitor(data):
@@ -89,8 +89,17 @@ def crawlling_foreigner_visitor(country, start_year, end_year):
                 #results += data
                 results.append(data)
 
-    #save data to file
-    print(results)
+    # save results to file(저장/적재)
+    filename = '%s/%s(%s)_foreign_visitor_%s_%s.json' % (RESULT_DIRECTORY,country[0],country[1],start_year,end_year)
+    with open(filename, 'w', encoding='utf-8')as outfile:
+        json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False) #indent:들여쓰기
+        outfile.write(json_string)
+
+
+if not os.path.exists(RESULT_DIRECTORY):
+    os.makedirs(RESULT_DIRECTORY)
+
+
 
 
 
