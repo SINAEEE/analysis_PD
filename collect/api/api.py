@@ -42,12 +42,12 @@ def pd_fetch_foreigner_visitor(country_code, year, month):
 
 
 def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, month=0):
+
       isNext = True
       json_pg=1
-      while isNext:
 
+      while isNext:
          url = pd_gen_url(
-              # ENDPOINT,
               YM='{0:04d}{1:02d}'.format(year, month),
               SIDO=district1,
               GUNGU=district2,
@@ -55,11 +55,11 @@ def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, m
               numOfRows=10,
               _type='json',
               pageNo=json_pg
-              # service_key=SERVICE_KEY
           )
 
          json_result = json_request(url=url)
 
+         #get메소드를 이용해서 값을 종류별로 나눠서 변수에 저장
          json_response = json_result.get('response')
          #json_header = json_response.get('header')
          #json_remsg = json_header.get('resultMsg')
@@ -72,6 +72,7 @@ def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, m
          json_total = json_body.get('totalCount')
          json_pg = json_body.get('pageNo')
 
+        #numOfRows를 넘어가는 내용이 있으면 다음페이지에서 출력하도록 해주는 구문
          if math.ceil(json_total/json_rows) == json_pg:
             isNext = False
          else:
