@@ -10,61 +10,70 @@ ENDPOINT = "http://openapi.tour.go.kr/openapi/service/TourismResourceStatsServic
 SERVICE_KEY ="L67Cl24axIN5YZAkFU4c9ZVT3%2B%2FS8nzuC%2FDCnoEpzgFZKHkq%2B0vGkNeNbnYbhmLRtnkmzxyNOnwT9RdcFULAGA%3D%3D"
 
 
-def pd_gen_url(endpoint, service_key, **params):
+def pd_gen_url(endpoint=ENDPOINT, service_key=SERVICE_KEY, **params):
     return '%s?%s&serviceKey=%s' % (endpoint, urlencode(params), service_key)
 
+def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, month=0):
+
+      isNext = True
+      json_pg=1
+      while isNext is True:
+
+         url = pd_gen_url(
+              # ENDPOINT,
+              YM='{0:04d}{1:02d}'.format(year, month),
+              SIDO=district1,
+              GUNGU=district2,
+              RES_NM=tourspot,
+              numOfRows=10,
+              _type='json',
+              pageNo=json_pg
+              # service_key=SERVICE_KEY
+          )
+
+         json_result = json_request(url=url)
+
+         json_response = json_result.get('response')
+         #json_header = json_response.get('header')
+         #json_remsg = json_header.get('resultMsg')
+
+         #if json_remsg is not 'OK':
+         #    break
+
+         json_body = json_response.get('body')
+         json_rows = json_body.get('numOfRows')
+         json_total = json_body.get('totalCount')
+         json_pg = json_body.get('pageNo')
+
+         if math.ceil(json_total/json_rows) == json_pg:
+            isNext = False
+         else:
+            json_pg +=1
+
+         json_items = json_body.get('items')
+
+         yield json_items.get('item')
 
 
-def pd_fetch_tourspot_visitor(
-        district1='',
-        district2='',
-        tourspot='',
-        year=0,
-        month=0,
-        service_key=''):
-    endpoint = 'http://openapi.tour.go.kr/openapi/service/TourismResourceStatsService/getPchrgTrrsrtVisitorList'
-    pageno = 1
-    hasnext = True
 
-    while hasnext:
-        url = pd_gen_url(
-            ENDPOINT,
-            SERVICE_KEY,
-            YM='{0:04d}{1:02d}'.format(year, month),
-            SIDO=district1,
-            GUNGU=district2,
-            RES_NM=tourspot,
-            numOfRows=100,
-            _type='json',
-            pageNo=pageno)
-        json_result = json_request(url=url)
-        if json_result is None:
-            break
 
-        json_response = json_result.get('response')
-        json_header = json_response.get('header')
-        result_message = json_header.get('resultMsg')
 
-        if 'OK' != result_message:
-            print('%s : Error[%s] for Request(%s)' % (datetime.now(), result_message, url), file=sys.stderr)
-            break
 
-        json_body = json_response.get('body')
 
-        numofrows = json_body.get('numOfRows')
-        totalcount = json_body.get('totalCount')
 
-        if totalcount == 0:
-            break
 
-        last_pageno = math.ceil(totalcount / numofrows)
-        if pageno == last_pageno:
-            hasnext = False
-        else:
-            pageno += 1
 
-        json_items = json_body.get('items')
-        yield json_items.get('item') if isinstance(json_items, dict) else None
+
+
+
+
+
+
+
+
+
+
+
 
 
 

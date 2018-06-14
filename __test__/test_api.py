@@ -1,5 +1,5 @@
 
-from analysis_PD.collect.api import api as pdapi
+from analysis_PD.collect.api import api as api
 
 
 """
@@ -18,18 +18,15 @@ url = pdapi.pd_gen_url(
 print(url) 
 """
 
+"""
+item = api.pd_fetch_tourspot_visitor(district1='서울특별시', year=2017, month=1)
+print(item)
+"""
 
-for item in pdapi.pd_fetch_tourspot_visitor(district1='서울특별시', year=2017, month=1):
+"""
+for item in api.pd_fetch_tourspot_visitor(district1='서울특별시', year=2017, month=1):
     print(item)
+"""
 
-"""
-# test from pd_fetch_tourspot_visitor
-for year in range(2017, 2018):
-    for month in range(1, 13):
-        for item in pdapi.pd_fetch_tourspot_visitor(
-                district1='서울특별시',
-                year=year,
-                month=month):
-            print(item)
-"""
+
 
