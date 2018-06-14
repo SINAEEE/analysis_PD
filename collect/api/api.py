@@ -42,10 +42,9 @@ def pd_fetch_foreigner_visitor(country_code, year, month):
 
 
 def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, month=0):
-
       isNext = True
       json_pg=1
-      while isNext is True:
+      while isNext:
 
          url = pd_gen_url(
               # ENDPOINT,
@@ -80,5 +79,7 @@ def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, m
 
          json_items = json_body.get('items')
 
+
          yield json_items.get('item')
+         #return json_items.get('item') if isinstance(json_items, dict) else None
 

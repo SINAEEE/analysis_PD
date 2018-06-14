@@ -33,44 +33,36 @@ def preprocess_foreign_visitor(data):
         del data['ym']
 
 
-"""
-def  preprocess_tourspot_visitor(item): #데이터전처리 : 공개할필요없는 함수
+
+def preprocess_tourspot_visitor(item): #데이터전처리 : 공개할필요없는 함수
+
+    #필요없는 항목 지우기
+    del item['addrCd']
+    del item['rnum']
+
     #내국인 수
-    if 'addrCd' not in item:
-        item['count_locals'] = 0
-    else:
-        item['count_locals'] = item['addrCd']
+    item['count_locals'] = item['csNatCnt']
+    del item['csNatCnt']
 
     #외국인 수
-    if 'csForCnt' not in item:
-        item['count_foreigner']=0
-    else:
-        item['count_foreigner']=item['csForCnt']
+    item['count_foreigner'] = item['csForCnt']
+    del item['csForCnt']
 
     #spot
-    if 'resNm' not in item:
-        item['tourist_spot'] = 0
-    else:
-        item['tourist_spot'] = item['resNm']
+    item['tourist_spot'] = item['resNm']
+    del item['resNm']
 
     #date
-    if 'ym' not in item:
-        item['date'] = 0
-    else:
-        item['date'] = item['ym']
+    item['date'] = item['ym']
+    del item['ym']
 
     #시, 도
-    if 'sido' not in item:
-        item['restrict1'] = 0
-    else:
-        item['restrict1'] = item['sido']
+    item['restrict1'] = item['sido']
+    del item['sido']
 
     #군,구
-    if 'gungu' in item:
-        item['restrict2'] = 0
-    else:
-        item['restrict2'] = item['gungu']
-"""
+    item['restrict2'] = item['gungu']
+    del item['gungu']
 
 
 def crawlling_foreigner_visitor(country, start_year, end_year):
@@ -102,23 +94,28 @@ if not os.path.exists(RESULT_DIRECTORY):
 
 
 
-
-
 def crawlling_tourspot_visitor(district, start_year, end_year):
 
     results = []
-    filename = '%s_%s_%s_%s.json' % (RESULT_DIRECTORY,district,start_year,end_year)
 
-    for items in api.pd_fetch_tourspot_visitor(district, start_year, end_year):
-        for item in items:
-            preprocess_post(item)
+    for year in range(start_year, end_year+1):
+        for month in range(1, 13):
+             for item in api.pd_fetch_tourspot_visitor(district, year=year, month=month):
+                for i in item:
+                    #print(item)
+                    if i is None:
+                        continue
+                    #print(type(item),item)
+                    preprocess_tourspot_visitor(i)
+                    results.append(i)
 
-        results += items
 
     # save results to file(저장/적재)
+    filename = '%s/%s_touristspot_%s_%s.json' % (RESULT_DIRECTORY, district, start_year, end_year)
     with open(filename, 'w', encoding='utf-8') as outfile:
         json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
         outfile.write(json_string)
+
 
 if os.path.exists(RESULT_DIRECTORY) is False:
     os.makedirs(RESULT_DIRECTORY)
