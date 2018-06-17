@@ -1,79 +1,86 @@
 
 from urllib.parse import urlencode
 from .json_request import json_request
-from datetime import datetime
-import sys
 import math
+from datetime import datetime
 
 
 ENDPOINT = "http://openapi.tour.go.kr/openapi/service/TourismResourceStatsService/getPchrgTrrsrtVisitorList"
 SERVICE_KEY ="L67Cl24axIN5YZAkFU4c9ZVT3%2B%2FS8nzuC%2FDCnoEpzgFZKHkq%2B0vGkNeNbnYbhmLRtnkmzxyNOnwT9RdcFULAGA%3D%3D"
 
 
-def pd_gen_url(endpoint, service_key, **params):
+def pd_gen_url(endpoint=ENDPOINT, service_key=SERVICE_KEY, **params):
     return '%s?%s&serviceKey=%s' % (endpoint, urlencode(params), service_key)
+#->service key자체는 encoding된 상태기때문에 또 encoding해주면 안됨
+
+
+def pd_fetch_foreigner_visitor(country_code, year, month):
+       endpoint = "http://openapi.tour.go.kr/openapi/service/EdrcntTourismStatsService/getEdrcntTourismStatsList"
+       url = pd_gen_url(endpoint,
+                        YM='{0:04d}{1:02d}'.format(year, month),
+                        NAT_CD=country_code,
+                        ED_CD='E',
+                        _type='json'
+                     )
+
+       json_result = json_request(url=url)
+
+       json_response = json_result.get('response')
+       json_header = json_response.get('header')
+
+       result_message = json_header.get('resultMsg')
+
+       if 'OK' != result_message:
+           print('%s Error [%s] for request %s' % (datetime.now), result_message, url)
+           return None
+
+       json_body = json_response.get('body')
+       json_items = json_body.get('items')
+
+       return json_items.get('item') if isinstance(json_items,dict) else None
 
 
 
-def pd_fetch_tourspot_visitor(
-        district1='',
-        district2='',
-        tourspot='',
-        year=0,
-        month=0,
-        service_key=''):
-    endpoint = 'http://openapi.tour.go.kr/openapi/service/TourismResourceStatsService/getPchrgTrrsrtVisitorList'
-    pageno = 1
-    hasnext = True
+def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, month=0):
 
-    while hasnext:
-        url = pd_gen_url(
-            ENDPOINT,
-            SERVICE_KEY,
-            YM='{0:04d}{1:02d}'.format(year, month),
-            SIDO=district1,
-            GUNGU=district2,
-            RES_NM=tourspot,
-            numOfRows=100,
-            _type='json',
-            pageNo=pageno)
-        json_result = json_request(url=url)
-        if json_result is None:
-            break
+      isNext = True
+      json_pg=1
 
-        json_response = json_result.get('response')
-        json_header = json_response.get('header')
-        result_message = json_header.get('resultMsg')
+      while isNext:
+         url = pd_gen_url(
+              YM='{0:04d}{1:02d}'.format(year, month),
+              SIDO=district1,
+              GUNGU=district2,
+              RES_NM=tourspot,
+              numOfRows=10,
+              _type='json',
+              pageNo=json_pg
+          )
 
-        if 'OK' != result_message:
-            print('%s : Error[%s] for Request(%s)' % (datetime.now(), result_message, url), file=sys.stderr)
-            break
+         json_result = json_request(url=url)
 
-        json_body = json_response.get('body')
+         #get메소드를 이용해서 값을 종류별로 나눠서 변수에 저장
+         json_response = json_result.get('response')
+         #json_header = json_response.get('header')
+         #json_remsg = json_header.get('resultMsg')
 
-        numofrows = json_body.get('numOfRows')
-        totalcount = json_body.get('totalCount')
+         #if json_remsg is not 'OK':
+         #    break
 
-        if totalcount == 0:
-            break
+         json_body = json_response.get('body')
+         json_rows = json_body.get('numOfRows')
+         json_total = json_body.get('totalCount')
+         json_pg = json_body.get('pageNo')
 
-        last_pageno = math.ceil(totalcount / numofrows)
-        if pageno == last_pageno:
-            hasnext = False
-        else:
-            pageno += 1
+        #numOfRows를 넘어가는 내용이 있으면 다음페이지에서 출력하도록 해주는 구문
+         if math.ceil(json_total/json_rows) == json_pg:
+            isNext = False
+         else:
+            json_pg +=1
 
-        json_items = json_body.get('items')
-        yield json_items.get('item') if isinstance(json_items, dict) else None
+         json_items = json_body.get('items')
 
 
-
-
-
-
-
-
-
-
-
+         yield json_items.get('item')
+         #return json_items.get('item') if isinstance(json_items, dict) else None
 
