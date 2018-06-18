@@ -110,29 +110,32 @@ def crawlling_tourspot_visitor(district,
                                service_key=''):
 
     results = []
+    filename = '%s/%s_touristspot_%s_%s.json' % (result_directory, district, start_year, end_year)
 
     if fetch:
         for year in range(start_year, end_year+1):
             for month in range(1, 13):
-                 for item in api.pd_fetch_tourspot_visitor(district=district,
+                 for item in api.pd_fetch_tourspot_visitor(district1=district,
                                                            year=year,
                                                            month=month,
                                                            service_key=service_key):
                     for i in item:
                         #print(item)
-                        if i is None:
-                            continue
+                        #if i is None:
+                         #   continue
                         #print(type(item),item)
                         preprocess_tourspot_visitor(i)
-                        results.append(i)
+
+                    results.append(i)
 
 
     # save results to file(저장/적재)
-    filename = '%s/%s_touristspot_%s_%s.json' % (result_directory, district, start_year, end_year)
-    with open(filename, 'w', encoding='utf-8') as outfile:
-        json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
-        outfile.write(json_string)
 
+        with open(filename, 'w', encoding='utf-8') as outfile:
+            json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
+            outfile.write(json_string)
+
+    return filename
 
 #if os.path.exists(RESULT_DIRECTORY) is False:
 #    os.makedirs(RESULT_DIRECTORY)
