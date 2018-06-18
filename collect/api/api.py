@@ -6,17 +6,18 @@ from datetime import datetime
 
 
 ENDPOINT = "http://openapi.tour.go.kr/openapi/service/TourismResourceStatsService/getPchrgTrrsrtVisitorList"
-SERVICE_KEY ="L67Cl24axIN5YZAkFU4c9ZVT3%2B%2FS8nzuC%2FDCnoEpzgFZKHkq%2B0vGkNeNbnYbhmLRtnkmzxyNOnwT9RdcFULAGA%3D%3D"
+#SERVICE_KEY ="L67Cl24axIN5YZAkFU4c9ZVT3%2B%2FS8nzuC%2FDCnoEpzgFZKHkq%2B0vGkNeNbnYbhmLRtnkmzxyNOnwT9RdcFULAGA%3D%3D"
 
 
-def pd_gen_url(endpoint=ENDPOINT, service_key=SERVICE_KEY, **params):
+def pd_gen_url(endpoint=ENDPOINT, service_key='', **params):
     return '%s?%s&serviceKey=%s' % (endpoint, urlencode(params), service_key)
 #->service key자체는 encoding된 상태기때문에 또 encoding해주면 안됨
 
 
-def pd_fetch_foreigner_visitor(country_code, year, month):
+def pd_fetch_foreigner_visitor(country_code, year, month, service_key=''):
        endpoint = "http://openapi.tour.go.kr/openapi/service/EdrcntTourismStatsService/getEdrcntTourismStatsList"
        url = pd_gen_url(endpoint,
+                        service_key,
                         YM='{0:04d}{1:02d}'.format(year, month),
                         NAT_CD=country_code,
                         ED_CD='E',
@@ -41,13 +42,19 @@ def pd_fetch_foreigner_visitor(country_code, year, month):
 
 
 
-def pd_fetch_tourspot_visitor(district1='', district2='', tourspot='', year=0, month=0):
+def pd_fetch_tourspot_visitor(district1='',
+                              district2='',
+                              tourspot='',
+                              year=0,
+                              month=0,
+                              service_key=''):
 
       isNext = True
       json_pg=1
 
       while isNext:
          url = pd_gen_url(
+              service_key='',
               YM='{0:04d}{1:02d}'.format(year, month),
               SIDO=district1,
               GUNGU=district2,

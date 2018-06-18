@@ -1,9 +1,8 @@
-
-import os
+#import os
 import json
 from .api import api
 
-RESULT_DIRECTORY = '__results__/crawlling'
+#RESULT_DIRECTORY = '__results__/crawlling'
 
 
 def preprocess_foreign_visitor(data):
@@ -65,57 +64,75 @@ def preprocess_tourspot_visitor(item): #데이터전처리 : 공개할필요없�
     del item['gungu']
 
 
-def crawlling_foreigner_visitor(country, start_year, end_year):
+def crawlling_foreigner_visitor(country,
+                                start_year,
+                                end_year,
+                                fetch=True,
+                                result_directory='',
+                                service_key=''):
 
     results = []
 
-    for year in range(start_year,end_year+1):
-        for month in range(1,13):
-            #print("fetching.." + country[0] + ":" + str(year) + "-" + str(month))
-                data = api.pd_fetch_foreigner_visitor(country[1],year,month)
-                #print(data)
-                if data is None:
-                    continue
+    if fetch:
+        for year in range(start_year,end_year+1):
+            for month in range(1,13):
+                #print("fetching.." + country[0] + ":" + str(year) + "-" + str(month))
+                    data = api.pd_fetch_foreigner_visitor(country[1],
+                                                          year,
+                                                          month,
+                                                          service_key)
+                    #print(data)
+                    if data is None:
+                        continue
 
-                preprocess_foreign_visitor(data)
-                #results += data
-                results.append(data)
+                    preprocess_foreign_visitor(data)
+                    #results += data
+                    results.append(data)
 
     # save results to file(저장/적재)
-    filename = '%s/%s(%s)_foreign_visitor_%s_%s.json' % (RESULT_DIRECTORY,country[0],country[1],start_year,end_year)
+    filename = '%s/%s(%s)_foreign_visitor_%s_%s.json' % (result_directory,country[0],country[1],start_year,end_year)
     with open(filename, 'w', encoding='utf-8')as outfile:
         json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False) #indent:들여쓰기
         outfile.write(json_string)
 
 
-if not os.path.exists(RESULT_DIRECTORY):
-    os.makedirs(RESULT_DIRECTORY)
+#if not os.path.exists(RESULT_DIRECTORY):
+#   os.makedirs(RESULT_DIRECTORY)
 
 
 
 
-def crawlling_tourspot_visitor(district, start_year, end_year):
+def crawlling_tourspot_visitor(district,
+                               start_year,
+                               end_year,
+                               fetch=True,
+                               result_directory='',
+                               service_key=''):
 
     results = []
 
-    for year in range(start_year, end_year+1):
-        for month in range(1, 13):
-             for item in api.pd_fetch_tourspot_visitor(district, year=year, month=month):
-                for i in item:
-                    #print(item)
-                    if i is None:
-                        continue
-                    #print(type(item),item)
-                    preprocess_tourspot_visitor(i)
-                    results.append(i)
+    if fetch:
+        for year in range(start_year, end_year+1):
+            for month in range(1, 13):
+                 for item in api.pd_fetch_tourspot_visitor(district=district,
+                                                           year=year,
+                                                           month=month,
+                                                           service_key=service_key):
+                    for i in item:
+                        #print(item)
+                        if i is None:
+                            continue
+                        #print(type(item),item)
+                        preprocess_tourspot_visitor(i)
+                        results.append(i)
 
 
     # save results to file(저장/적재)
-    filename = '%s/%s_touristspot_%s_%s.json' % (RESULT_DIRECTORY, district, start_year, end_year)
+    filename = '%s/%s_touristspot_%s_%s.json' % (result_directory, district, start_year, end_year)
     with open(filename, 'w', encoding='utf-8') as outfile:
         json_string = json.dumps(results, indent=4, sort_keys=True, ensure_ascii=False)
         outfile.write(json_string)
 
 
-if os.path.exists(RESULT_DIRECTORY) is False:
-    os.makedirs(RESULT_DIRECTORY)
+#if os.path.exists(RESULT_DIRECTORY) is False:
+#    os.makedirs(RESULT_DIRECTORY)
