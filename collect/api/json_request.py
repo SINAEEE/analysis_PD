@@ -12,10 +12,13 @@ def json_request(
     try:
         # 매개변수로 받은 url에 json 요청을 보내고 그 응답으로 json을 리턴받아 처리
         request = Request(url)
+
         #urllib.request.Request 사용시 json문자열이아닌 json바이트배열로 주고 받아야함
         resp = urlopen(request)
 
         resp_body = resp.read().decode(encoding) #decode:바이트를 문자열로 변환
+
+
         json_result = json.loads(resp_body)
 
         print('%s : success for request [%s]' % (datetime.now(), url))
@@ -24,6 +27,7 @@ def json_request(
             return json_result
 
         success(json_result)
+
 
 
     except Exception as e:
