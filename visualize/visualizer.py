@@ -14,5 +14,5 @@ def graph_scatter(result_analysis):
             c='black',
             s=6)
 
-    plt.subplots_adjust(wspace=0)
+    #plt.subplots_adjust(wspace=0)
     plt.show()

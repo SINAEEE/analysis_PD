@@ -73,6 +73,7 @@ def crawlling_foreigner_visitor(country,
 
         results = []
         filename = '%s/%s(%s)_foreign_visitor_%s_%s.json' % (result_directory, country[0], country[1], start_year, end_year)
+
         if fetch:
             for year in range(start_year,end_year+1):
                 for month in range(1,13):
