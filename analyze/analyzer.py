@@ -49,15 +49,16 @@ def analysis_correlation_by_tourspot(resultfiles):
 
         tourspotvisitor_table = pd.DataFrame(json_data, columns=['count_foreigner', 'date', 'tourist_spot'])
         tourist_spot = tourspotvisitor_table['tourist_spot'].unique()
-        #temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot']=='경복궁']
+        temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot']=='경복궁']
         #print(temp_table)
 
         temp = []
         for spot in tourist_spot:
             temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot'] == spot]
+
             temp.append(temp_table)
 
-        print(temp)
+        return temp
 
 
         results = []
