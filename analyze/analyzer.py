@@ -42,10 +42,46 @@ def analysis_correlation(resultfiles):
     return results
 
 
+
 def analysis_correlation_by_tourspot(resultfiles):
     with open (resultfiles['tourspot_visitor'], 'r', encoding='utf-8') as infile:
         json_data = json.loads(infile.read())
 
+        tourspotvisitor_table = pd.DataFrame(json_data, columns=['count_foreigner', 'date', 'tourist_spot'])
+        tourist_spot = tourspotvisitor_table['tourist_spot'].unique()
+        #temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot']=='경복궁']
+        #print(temp_table)
+
+        temp = []
+        for spot in tourist_spot:
+            temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot'] == spot]
+            temp.append(temp_table)
+
+        print(temp)
+
+
+        results = []
+        for filename in resultfiles['foreign_visitor']:
+            with open(filename, 'r', encoding='utf-8') as infile:
+                json_data = json.loads(infile.read())
+            foreignvisitor_table = pd.DataFrame(json_data, columns=['country_Name', 'date', 'visit_counter'])
+            foreignvisitor_table = foreignvisitor_table.set_index('date')
+
+            """
+            merge_table = pd.merge(
+                temp_tourspotvisitor_table,
+                foreignvisitor_table,
+                left_index=True, right_index=True)
+            """
+
+        #print(foreignvisitor_table)
+
+
+
+
+
+
+"""
         tourspot_table = pd.DataFrame(json_data, columns=['count_foreigner','date','tourist_spot'])
         #print(tourspot_table)
         # 관광지별 외국인수
@@ -61,7 +97,7 @@ def analysis_correlation_by_tourspot(resultfiles):
 
             #print(foreignvisitor_table)
             #foreignvisitor_table = foreignvisitor_table.set_index('tourist_spot')
-
+"""
 
 
 
