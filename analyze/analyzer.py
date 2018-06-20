@@ -12,7 +12,7 @@ def analysis_correlation(resultfiles):
     tourspotvisitor_table = pd.DataFrame(json_data, columns=['count_foreigner', 'date', 'tourist_spot'])
     temp_tourspotvisitor_table = pd.DataFrame(tourspotvisitor_table.groupby('date')['count_foreigner'].sum())
     #print(tourspotvisitor_table)
-    #print(temp_tourspotvisitor_table)
+    print(temp_tourspotvisitor_table)
 
     results = []
     for filename in resultfiles['foreign_visitor']:
@@ -44,56 +44,33 @@ def analysis_correlation(resultfiles):
 
 
 def analysis_correlation_by_tourspot(resultfiles):
-    with open (resultfiles['tourspot_visitor'], 'r', encoding='utf-8') as infile:
+    with open(resultfiles['tourspot_visitor'], 'r', encoding='utf-8') as infile:
         json_data = json.loads(infile.read())
 
-        tourspotvisitor_table = pd.DataFrame(json_data, columns=['count_foreigner', 'date', 'tourist_spot'])
-        tourist_spot = tourspotvisitor_table['tourist_spot'].unique()
-        #temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot']=='경복궁']
-        #print(temp_table)
+    tourspotvisitor_table = pd.DataFrame(json_data, columns=['count_foreigner', 'date', 'tourist_spot'])
+    tourist_spot = tourspotvisitor_table['tourist_spot'].unique()
+    #temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot'] == '경복궁']
+    #temp_table = temp_table.set_index('date')
+    #print(temp_table)
 
-        results = []
-        for spot in tourist_spot:
-            temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot'] == spot]
-            #temp.append(temp_table)
-            #print(temp)
-            for filename in resultfiles['foreign_visitor']:
-                with open(filename, 'r', encoding='utf-8')as infile:
-                    json_data = json.loads(infile.read())
-                foreignvisitor_table = pd.DataFrame(json_data,columns=['country_Name','visit_counter'])
-                #temp.append(foreignvisitor_table)
+    for spot in tourist_spot:
+        temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot'] == spot]
+        temp_table = temp_table.set_index('date')
 
-                merge_table = pd.merge(
-                    temp_table,
-                    foreignvisitor_table,
-                    left_index=True, right_index=True)
-
-                results.append(merge_table)
-                print(merge_table)
-
-
-
-        #return temp
-
-
-
-        results = []
         for filename in resultfiles['foreign_visitor']:
             with open(filename, 'r', encoding='utf-8') as infile:
                 json_data = json.loads(infile.read())
-            foreignvisitor_table = pd.DataFrame(json_data, columns=['country_Name', 'date', 'visit_counter'])
+            foreignvisitor_table = pd.DataFrame(json_data, columns=['country_Name','date', 'visit_counter'])
             foreignvisitor_table = foreignvisitor_table.set_index('date')
+            #print(foreignvisitor_table)
+            #print(temp_table)
 
-            """
             merge_table = pd.merge(
-                temp_tourspotvisitor_table,
+                temp_table,
                 foreignvisitor_table,
-                left_index=True, right_index=True)
-            """
-
-        #print(foreignvisitor_table)
-
-
+                left_index=True, right_index=True
+            )
+            print(merge_table)
 
 
 
