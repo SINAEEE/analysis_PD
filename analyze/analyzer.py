@@ -30,7 +30,7 @@ def analysis_correlation(resultfiles):
         y = list(merge_table['count_foreigner']) #외국인수
         country_name = foreignvisitor_table['country_name'].unique().item(0)
         #print(x)
-        #print(y)
+        #print(y,type(y))
         r = ss.pearsonr(x, y)[0] #튜플값이 나옴
         # r = np.corrcoef(x, y)[0]
         results.append({'x': x, 'y': y, 'country_name': country_name, 'r': r})
@@ -57,6 +57,8 @@ def analysis_correlation_by_tourspot(resultfiles):
         temp_table = tourspotvisitor_table[tourspotvisitor_table['tourist_spot'] == spot]
         temp_table = temp_table.set_index('date')
 
+        results = []
+        r = []
         for filename in resultfiles['foreign_visitor']:
             with open(filename, 'r', encoding='utf-8') as infile:
                 json_data = json.loads(infile.read())
@@ -70,31 +72,40 @@ def analysis_correlation_by_tourspot(resultfiles):
                 foreignvisitor_table,
                 left_index=True, right_index=True
             )
-            print(merge_table)
+
+            x = list(merge_table['visit_counter']) #총 방문자수
+            y = list(merge_table['count_foreigner'])  # 외국인방문객수
+            country_name = foreignvisitor_table['country_Name'].unique().item(0)
+            tourist_spot = temp_table['tourist_spot'].unique().item(0)
+
+            r = correlation_coefficient(x, y)
+            #print(r)
+            results.append({"tourspot":tourist_spot,"country_name":country_name,"r":r})
+
+        print(results)
 
 
+def correlation_coefficient(x, y):
+    n = len(x)
+    vals = range(n)
 
+    x_sum = 0.0
+    y_sum = 0.0
+    x_sum_pow = 0.0
+    y_sum_pow = 0.0
+    mul_xy_sum = 0.0
 
-"""
-        tourspot_table = pd.DataFrame(json_data, columns=['count_foreigner','date','tourist_spot'])
-        #print(tourspot_table)
-        # 관광지별 외국인수
-        temp_tourspot_table = pd.DataFrame(tourspot_table.groupby('tourist_spot')['count_foreigner'].sum())
-        print(temp_tourspot_table)
+    for i in vals:
+        mul_xy_sum = mul_xy_sum + float(x[i]) * float(y[i])
+        x_sum = x_sum + float(x[i])
+        y_sum = y_sum + float(y[i])
+        x_sum_pow = x_sum_pow + pow(float(x[i]), 2)
+        y_sum_pow = y_sum_pow + pow(float(y[i]), 2)
 
-        results = []
-        for filename in resultfiles['foreign_visitor']:
-            with open(filename, 'r', encoding='utf-8') as infile:
-                json_data = json.loads(infile.read())
+    try:
+        r = ((n * mul_xy_sum) - (x_sum * y_sum)) / \
+            math.sqrt(((n * x_sum_pow) - pow(x_sum, 2)) * ((n * y_sum_pow) - pow(y_sum, 2)))
+    except ZeroDivisionError:
+        r = 0.0
 
-            foreignvisitor_table = pd.DataFrame(json_data, columns=['country_Name','date','visit_counter'])
-
-            #print(foreignvisitor_table)
-            #foreignvisitor_table = foreignvisitor_table.set_index('tourist_spot')
-"""
-
-
-
-
-
-
+    return r

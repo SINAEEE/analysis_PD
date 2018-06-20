@@ -4,6 +4,7 @@ import visualize
 from config import CONFIG
 
 
+
 if __name__ == '__main__':
 
     # 데이터 수집(collection)
@@ -12,6 +13,7 @@ if __name__ == '__main__':
     #collect.crawlling_tourspot_visitor( district=CONFIG['district'], **CONFIG['common'])
 
     resultfiles = dict()
+
     resultfiles['tourspot_visitor'] = collect.crawlling_tourspot_visitor(district=CONFIG['district'],
                                                                          **CONFIG['common'])
 
@@ -39,6 +41,7 @@ if __name__ == '__main__':
 
     result_analysis = analyze.analysis_correlation_by_tourspot(resultfiles)
     print(result_analysis)
+
 
     #graph_table = pd.DataFrame(result_analysis, colums=['tourspot','r_중국','r_일본','r_미국'])
     #graph_table = graph_table.set_index('tourspot')
