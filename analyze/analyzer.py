@@ -73,9 +73,10 @@ def analysis_correlation_by_tourspot(resultfiles):
                 left_index=True, right_index=True
             )
 
-            x = list(merge_table['visit_counter']) #총 방문자수
-            y = list(merge_table['count_foreigner'])  # 외국인방문객수
+            y = list(merge_table['visit_counter']) #총 방문자수
+            x = list(merge_table['count_foreigner'])  # 외국인방문객수
             #수정필요 : x->외국인방문객수, y->총방문자수
+            #-> 스팟에 대한 방문객수가 늘어날수록 총 방문자수가 늘어날것이기 떄문
             country_name = foreignvisitor_table['country_Name'].unique().item(0)
             tourist_spot = temp_table['tourist_spot'].unique().item(0)
 
