@@ -34,13 +34,16 @@ if __name__ == '__main__':
     #1. analysis and visualize
 
     #result_analysis = analyze.analysis_correlation(resultfiles)
+    #print(len(resultfiles))
     #print(result_analysis)
     #visualize.graph_scatter(result_analysis)
+
 
     #2. analysis and visualize
 
     result_analysis = analyze.analysis_correlation_by_tourspot(resultfiles)
-    print(result_analysis)
+    #print(type(result_analysis))
+    visualize.graph_bar(result_analysis)
 
 
     #graph_table = pd.DataFrame(result_analysis, colums=['tourspot','r_중국','r_일본','r_미국'])
